@@ -15,11 +15,12 @@ struct veiculos{
     char tipo[TAM_TIPO];
     char placa[TAM_PLACA];
     struct veiculos *proximoVeiculo;
+    struct Pessoa *listaPessoa;
 };
 
 struct Pessoa {
     char nome[TAM_NOME];
-    char cpf[13];
+    int cpf;
     struct Pessoa *proximo;
 };
 typedef struct Pessoa pessoa;
@@ -45,6 +46,9 @@ void excluirVeiculo();
 void imprimirVeiculo(struct veiculos *primeiroVeiculo);
 
 //FUNÇÕES ADD PESSOAS
+void adicionarPessoaFim(struct veiculos *primeiroVeiculo);
+
+
 //FUNÇÕES PESSOAS
 
 int main(){
@@ -208,10 +212,14 @@ void opcoesMenuPessoa(int *opcaoPessoa) {
 
     }
 }
+
+
 void adicionarVeiculoInicio() {
     // ponteiro para armazenar as novas informações do veículo
-
     struct veiculos *novoVeiculo = (struct veiculos *) malloc(sizeof(struct veiculos));
+    //pessoa *primeiraPessoa = NULL;
+    novoVeiculo->listaPessoa= NULL;
+
     printf("\nDigite o tipo de veiculo (carro de apoio ou caminhao): ");
     fgets(novoVeiculo->tipo, TAM_TIPO, stdin);
     novoVeiculo->tipo[strcspn(novoVeiculo->tipo, "\n")] = '\0';
@@ -229,6 +237,9 @@ void adicionarVeiculoMeio(){
         printf("É necessario ter, pelo menos, dois veículos para inserir um veiculo no meio! \n");
     } else {
         struct veiculos *novoVeiculo = (struct veiculos *) malloc(sizeof(struct veiculos));
+        //pessoa *primeiraPessoa = NULL;
+        novoVeiculo->listaPessoa= NULL;
+
         printf("Digite o tipo de veiculo (carro de apoio ou caminhao): ");
         fgets(novoVeiculo->tipo, TAM_TIPO, stdin);
         novoVeiculo->tipo[strcspn(novoVeiculo->tipo, "\n")] = '\0';
@@ -270,6 +281,8 @@ void adicionarVeiculoFim(){
         printf("Por favor, insira um veiculo. \n");
     }else{
         struct veiculos *novoVeiculo = (struct veiculos *) malloc(sizeof(struct veiculos));
+        //pessoa *primeiraPessoa = NULL;
+        novoVeiculo->listaPessoa= NULL;
         printf("\nDigite o tipo de veiculo (carro de apoio ou caminhao): ");
         fgets(novoVeiculo->tipo, TAM_TIPO, stdin);
         novoVeiculo->tipo[strcspn(novoVeiculo->tipo, "\n")] = '\0';
@@ -427,6 +440,42 @@ void imprimirVeiculo(struct veiculos *primeiroVeiculo) {
             ponteiroVeiculo= ponteiroVeiculo->proximoVeiculo;
         };
         printf("\nTotal de veiculos registrados: %d\n\n", contadorVeiculos());
+    }
+}
+
+void adicionarPessoaFim() {
+    if (primeiroVeiculo == NULL){
+        printf("A lista de veiculos esta  vazia! \n");
+        printf("Por favor, insira um veiculo. \n");
+    }else {
+        char placa_buscada[TAM_PLACA];
+        printf("\nDigite a placa do veiculo onde voce deseja adicionar: ");
+        fgets(placa_buscada, TAM_PLACA, stdin);
+        placa_buscada[strcspn(placa_buscada, "\n")] = '\0';
+        struct veiculos *atualVeiculo = primeiroVeiculo;
+        while(strcmp(atualVeiculo->placa, placa_buscada) != 0 && atualVeiculo->proximoVeiculo !=NULL) {
+            atualVeiculo = atualVeiculo->proximoVeiculo;
+        }
+        if(strcmp(atualVeiculo->placa, placa_buscada) == 0) {
+            pessoa *novaPessoa = malloc(sizeof(pessoa));
+            novaPessoa->proximo = NULL;
+            printf("\nDigite o nome da pessoa: ");
+            fgets(novaPessoa->nome, TAM_NOME, stdin);
+            printf("\nDigite o CPF da pessoa: ");
+            scanf("%d", &novaPessoa->cpf);
+
+            if (atualVeiculo->listaPessoa == NULL){
+                atualVeiculo->listaPessoa = novaPessoa;
+            }else {
+                pessoa *tempPessoa = atualVeiculo->listaPessoa;
+                while (tempPessoa->proximo!= NULL){
+                    tempPessoa = tempPessoa->proximo;
+                }
+                tempPessoa->proximo = novaPessoa;
+            }
+        }else{
+            printf("O veiculo não existe! \n");
+        }
     }
 }
 
