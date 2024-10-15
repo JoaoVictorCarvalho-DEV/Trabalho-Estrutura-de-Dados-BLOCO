@@ -46,7 +46,7 @@ void excluirVeiculo();
 void imprimirVeiculo(struct veiculos *primeiroVeiculo);
 
 //FUNÇÕES ADD PESSOAS
-void adicionarPessoaFim(struct veiculos *primeiroVeiculo);
+void adicionarPessoaFim();
 
 
 //FUNÇÕES PESSOAS
@@ -194,8 +194,8 @@ void opcoesMenuPessoa(int *opcaoPessoa) {
         system("cls");
         switch (*opcaoPessoa) {
             case 1:
-                printf("\n------------------------<<< ADICIONAR PESSOA >>>---------------------- \n");
-                printf("FUNCAO NAO CRIADA");
+                printf("\n------------------------<<< ADICIONAR PESSOA FIM >>>---------------------- \n");
+                adicionarPessoaFim();
                 system("pause");
                 break;
             case 2:
@@ -433,12 +433,25 @@ void imprimirVeiculo(struct veiculos *primeiroVeiculo) {
     }else{
         struct veiculos *ponteiroVeiculo = primeiroVeiculo;
         while(ponteiroVeiculo != NULL){
+
             qtdVeiculo++;
             printf("\nVeiculo %d \n", qtdVeiculo);
             printf("Tipo de Veiculo: %s\n", ponteiroVeiculo->tipo);
             printf("Placa do Veiculo: %s\n", ponteiroVeiculo->placa);
+            printf("PESSOAS:\n");
+            if(ponteiroVeiculo->listaPessoa == NULL) {
+                printf("Sem pessoas\n");
+            }else {
+                pessoa *ponteiroPessoaTemp = ponteiroVeiculo->listaPessoa;
+                while (ponteiroPessoaTemp!= NULL) {
+                    printf("Nome: %s\n",ponteiroPessoaTemp->nome);
+                    printf("CPF: %d\n\n",ponteiroPessoaTemp->cpf);
+                    ponteiroPessoaTemp = ponteiroPessoaTemp->proximo;
+                }
+            }
             ponteiroVeiculo= ponteiroVeiculo->proximoVeiculo;
-        };
+            //ponteiroPessoaTemp = ponteiroVeiculo->listaPessoa;
+        }
         printf("\nTotal de veiculos registrados: %d\n\n", contadorVeiculos());
     }
 }
@@ -466,18 +479,21 @@ void adicionarPessoaFim() {
 
             if (atualVeiculo->listaPessoa == NULL){
                 atualVeiculo->listaPessoa = novaPessoa;
+                printf("\n %s adicionado com sucesso!",novaPessoa->nome);
             }else {
                 pessoa *tempPessoa = atualVeiculo->listaPessoa;
                 while (tempPessoa->proximo!= NULL){
                     tempPessoa = tempPessoa->proximo;
                 }
                 tempPessoa->proximo = novaPessoa;
+                printf("\n %s adicionado com sucesso!",novaPessoa->nome);
             }
         }else{
             printf("O veiculo não existe! \n");
         }
     }
 }
+
 
 
 
