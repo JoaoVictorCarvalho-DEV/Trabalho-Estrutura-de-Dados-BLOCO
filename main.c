@@ -43,10 +43,11 @@ void buscarVeiculo();
 int contadorVeiculos();
 void editarVeiculos();
 void excluirVeiculo();
-void imprimirVeiculo(struct veiculos *primeiroVeiculo);
+void imprimirVeiculo();
 
 //FUNÇÕES ADD PESSOAS
 void adicionarPessoaFim();
+void trocarPessoa();
 
 
 //FUNÇÕES PESSOAS
@@ -119,7 +120,7 @@ void menuVeiculo() {
 void menuPessoa() {
     printf("\n-----------<<< Gerenciamento de Pessoas>>>----------- \n");
     printf("\n1 - Adicionar pessoa");
-    printf("\n2 - Retirar pessoa");
+    printf("\n2 - Trocar pessoa do veículo");
     printf("\n3 - Exibir pessoas ");
     printf("\n0 - Sair");
 }
@@ -200,7 +201,7 @@ void opcoesMenuPessoa(int *opcaoPessoa) {
                 break;
             case 2:
                 printf("\n------------------------<<< REMOVER PESSOA >>>---------------------- \n");
-                printf("FUNCAO NAO CRIADA");
+                trocarPessoa();
                 system("pause");
                 break;
             case 3:
@@ -424,7 +425,7 @@ void excluirVeiculo(){
     }
 }
 
-void imprimirVeiculo(struct veiculos *primeiroVeiculo) {
+void imprimirVeiculo() {
 
     int qtdVeiculo = 0;
     if (primeiroVeiculo == NULL){
@@ -493,6 +494,121 @@ void adicionarPessoaFim() {
         }
     }
 }
+
+void trocarPessoa() {
+    if (primeiroVeiculo == NULL){
+        printf("A lista de veiculos esta  vazia! \n");
+        printf("Por favor, insira um veiculo. \n");
+    }else {
+        int qtdVeiculo = 1;
+        char placa_buscada[TAM_PLACA];
+
+        printf("\nDigite a placa do veiculo onde a pessoa esta: ");
+        fgets(placa_buscada, TAM_PLACA, stdin);
+        placa_buscada[strcspn(placa_buscada, "\n")] = '\0';
+        struct veiculos *ponteiroVeiculoTemp = primeiroVeiculo;
+
+        while(strcmp(ponteiroVeiculoTemp->placa, placa_buscada) != 0 && ponteiroVeiculoTemp->proximoVeiculo !=NULL) {
+            ponteiroVeiculoTemp = ponteiroVeiculoTemp->proximoVeiculo;
+            qtdVeiculo++;
+        }
+
+        if(strcmp(ponteiroVeiculoTemp->placa, placa_buscada) == 0){
+            printf("O veiculo foi localizado: \n");
+            printf("\nVeiculo %d \n", qtdVeiculo);
+            printf("Tipo de Veiculo: %s\n", ponteiroVeiculoTemp->tipo);
+            printf("Placa do Veiculo: %s\n", ponteiroVeiculoTemp->placa);
+
+            //Encontramos o veiculo!
+
+            if(ponteiroVeiculoTemp->listaPessoa == NULL) {
+                printf("Sem pessoas\n");
+            }else {
+                //mostrando as pessoas na tela
+                pessoa *ponteiroPessoaTemp = ponteiroVeiculoTemp->listaPessoa;
+                while (ponteiroPessoaTemp!= NULL) {
+                    printf("Nome: %s\n",ponteiroPessoaTemp->nome);
+                    printf("CPF: %d\n\n",ponteiroPessoaTemp->cpf);
+                    ponteiroPessoaTemp = ponteiroPessoaTemp->proximo;
+                }
+
+                //hora de escolher a pessoa que vai ser trocada de veículo
+                char pessoaBuscada[TAM_NOME];
+                printf("\nDigite o nome da pessoa que voce quer retirar: ");
+                fgets(pessoaBuscada, TAM_NOME, stdin);
+
+                pessoa *ponteiroTempAntecessor = ponteiroVeiculoTemp->listaPessoa;
+                pessoa *ponteiroTempSucessor = ponteiroTempAntecessor->proximo;
+                pessoa *ponteiroSalvarPessoa = NULL;
+                //buscando a pessoa
+                if (strcmp(ponteiroTempAntecessor->nome, pessoaBuscada)==0) {
+                    ponteiroSalvarPessoa= ponteiroTempAntecessor;
+                    ponteiroVeiculoTemp->listaPessoa=ponteiroTempSucessor;
+                    ponteiroSalvarPessoa->proximo=NULL;
+
+                    qtdVeiculo = 1;
+                    printf("\nDigite a placa do veiculo onde a pessoa vai ficar: ");
+                    fgets(placa_buscada, TAM_PLACA, stdin);
+                    placa_buscada[strcspn(placa_buscada, "\n")] = '\0';
+                    //procurando o veículo
+                    ponteiroVeiculoTemp = primeiroVeiculo;
+                    while(strcmp(ponteiroVeiculoTemp->placa, placa_buscada) != 0 && ponteiroVeiculoTemp->proximoVeiculo !=NULL) {
+                        ponteiroVeiculoTemp = ponteiroVeiculoTemp->proximoVeiculo;
+                        qtdVeiculo++;
+                    }
+                    if(strcmp(ponteiroVeiculoTemp->placa, placa_buscada) == 0) {
+                        if(ponteiroVeiculoTemp->listaPessoa == NULL) {
+                            ponteiroVeiculoTemp->listaPessoa = ponteiroSalvarPessoa;
+                            ponteiroSalvarPessoa->proximo = NULL;
+                        }else {
+                            ponteiroSalvarPessoa->proximo = ponteiroVeiculoTemp->listaPessoa;
+                            ponteiroVeiculoTemp->listaPessoa = ponteiroSalvarPessoa;
+                        }
+                    }else {
+                        printf("\nO veiculo nao existe!");
+                    }
+                }else if(strcmp(ponteiroTempSucessor->nome,pessoaBuscada)==0) {
+                    while (strcmp(ponteiroTempSucessor->nome,pessoaBuscada)!=0 && ponteiroTempSucessor->proximo!= NULL) {
+                        ponteiroTempAntecessor = ponteiroTempSucessor;
+                        ponteiroTempSucessor = ponteiroTempSucessor->proximo;
+                    }
+
+                    ponteiroTempAntecessor->proximo = ponteiroTempSucessor->proximo;
+                    ponteiroTempSucessor->proximo = NULL;
+                    ponteiroSalvarPessoa = ponteiroTempSucessor;
+                    //o nó foi salvo e a lista foi reconfigurada
+
+                qtdVeiculo = 1;
+                printf("\nDigite a placa do veiculo onde a pessoa vai ficar: ");
+                fgets(placa_buscada, TAM_PLACA, stdin);
+                placa_buscada[strcspn(placa_buscada, "\n")] = '\0';
+                //procurando o veículo
+                ponteiroVeiculoTemp = primeiroVeiculo;
+                while(strcmp(ponteiroVeiculoTemp->placa, placa_buscada) != 0 && ponteiroVeiculoTemp->proximoVeiculo !=NULL) {
+                    ponteiroVeiculoTemp = ponteiroVeiculoTemp->proximoVeiculo;
+                    qtdVeiculo++;
+                }
+                if(strcmp(ponteiroVeiculoTemp->placa, placa_buscada) == 0) {
+                    if(ponteiroVeiculoTemp->listaPessoa == NULL) {
+                        ponteiroVeiculoTemp->listaPessoa = ponteiroSalvarPessoa;
+                        ponteiroSalvarPessoa->proximo = NULL;
+                    }else {
+                        ponteiroSalvarPessoa->proximo = ponteiroVeiculoTemp->listaPessoa;
+                        ponteiroVeiculoTemp->listaPessoa = ponteiroSalvarPessoa;
+                    }
+                }else {
+                    printf("\nO veiculo nao existe!");
+                }
+            }else {
+                    printf("\n A pessoa não existe");
+                }
+            }
+        }else{
+            printf("O veiculo não existe! \n");
+        }
+    }
+}
+
 
 
 
